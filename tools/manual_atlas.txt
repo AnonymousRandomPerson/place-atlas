@@ -1,0 +1,56 @@
+
+
+========================================
+
+Submission ID:u6vh5i
+
+Traceback (most recent call last):
+  File "redditcrawl.py", line 113, in <module>
+    submission_json = json.loads(text)
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/json/__init__.py", line 357, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 11 column 7 (char 150)
+
+
+==== RAW ====
+
+    {
+    	"id": 0,
+    	"name": "??",
+    	"description": "",
+    	"links": {},
+    	"center": {
+    		"164": [
+    			939.5,
+    			977.5
+    		]
+    	},
+    	"path": {
+    		"164": [
+    			[
+    				938.5,
+    				934.5
+    			],
+    			[
+    				908.5,
+    				993.5
+    			],
+
+==== CLEAN ====
+
+{
+    	"id": 0,
+    	"name": "??",
+    	"description": "",
+    	"links": {},
+    	"center": {
+    		"164": [
+    			939.5,
+    			977.5
+    		]
+    	}
+
