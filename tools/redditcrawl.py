@@ -1,4 +1,5 @@
 import praw
+from psaw import PushshiftAPI
 import json
 import time
 import re
@@ -24,6 +25,7 @@ reddit = praw.Reddit(
 	password=password,
 	user_agent='atlas_bot'
 )
+psawApi = PushshiftAPI(reddit)
 
 has_write_access = not reddit.read_only
 if not has_write_access:
@@ -49,7 +51,8 @@ successcount = 0
 totalcount = 0
 
 outfile.write("[\n")
-for submission in reddit.subreddit('placeAtlas2').new(limit=2000):
+for submission in psawApi.search_submissions(subreddit='placeAtlas2', limit=50000):
+#for submission in reddit.subreddit('placeAtlas2').new(limit=30000):
 	"""
 	Auth setup
 	1. Head to https://www.reddit.com/prefs/apps
@@ -75,16 +78,16 @@ for submission in reddit.subreddit('placeAtlas2').new(limit=2000):
 	"""
 	total_all_flairs += 1
 
-	if (submission.id in existing_ids):
-		set_flair(submission, "Processed Entry")
-		print("Found first duplicate!")
-		duplicate_count += 1
-		if (duplicate_count > 0):
-			break
-		else:
-			continue
+	# if (submission.id in existing_ids):
+	# 	set_flair(submission, "Processed Entry")
+	# 	print("Found first duplicate!")
+	# 	duplicate_count += 1
+	# 	if (duplicate_count > 0):
+	# 		break
+	# 	else:
+	# 		continue
 
-	if (submission.link_flair_text == "New Entry"):
+	if (submission.link_flair_text == "New Entry" or submission.link_flair_text == "Processed Entry"):
 
 		try:
 
@@ -117,20 +120,22 @@ for submission in reddit.subreddit('placeAtlas2').new(limit=2000):
 				outfile.write(json.dumps(submission_json, ensure_ascii=False) + ",\n")
 				editidsfile.write(submission.id + '\n')
 				successcount += 1
-				set_flair(submission, "Processed Entry")
+				if submission.link_flair_text == "New Entry":
+					set_flair(submission, "Processed Entry")
 
 		except Exception as e:
-			failfile.write(
-				"\n\n" + "="*40 + "\n\n" +
-				submission.id + "\n\n" +
-				traceback.format_exc() + "\n\n" +
-				"==== RAW ====" + "\n\n" +
-				rawtext + "\n\n"
-				"==== CLEAN ====" + "\n\n" +
-				text + "\n\n"
-			)
+			# failfile.write(
+			# 	"\n\n" + "="*40 + "\n\n" +
+			# 	submission.id + "\n\n" +
+			# 	traceback.format_exc() + "\n\n" +
+			# 	"==== RAW ====" + "\n\n" +
+			# 	rawtext + "\n\n"
+			# 	"==== CLEAN ====" + "\n\n" +
+			# 	text + "\n\n"
+			# )
 			failcount += 1
-			set_flair(submission, "Rejected Entry")
+			if submission.link_flair_text == "New Entry":
+				set_flair(submission, "Rejected Entry")
 
 		print("Wrote "+submission.id+", submitted "+str(round(time.time()-submission.created_utc))+" seconds ago")
 		totalcount += 1
