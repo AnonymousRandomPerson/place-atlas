@@ -19,7 +19,7 @@ with open('credentials', 'r') as file:
 	password = credentials[3].strip() if len(credentials) > 3 else ""
 
 reddit = praw.Reddit(
-	client_id=client_id, 
+	client_id=client_id,
 	client_secret=client_secret,
 	username=username,
 	password=password,
@@ -34,9 +34,13 @@ if not has_write_access:
 
 existing_ids = []
 
-with open('../data/edit-ids.txt', 'r') as edit_ids_file:
+with open('./inspection/missed-ids.txt', 'r') as edit_ids_file:
 	for id in [x.strip() for x in edit_ids_file.readlines()]:
 		existing_ids.append(id)
+
+# with open('../data/edit-ids.txt', 'r') as edit_ids_file:
+# 	for id in [x.strip() for x in edit_ids_file.readlines()]:
+# 		existing_ids.append(id)
 
 def set_flair(submission, flair):
 	if has_write_access and submission.link_flair_text != flair:
@@ -51,8 +55,14 @@ successcount = 0
 totalcount = 0
 
 outfile.write("[\n")
-for submission in psawApi.search_submissions(subreddit='placeAtlas2', limit=50000):
-#for submission in reddit.subreddit('placeAtlas2').new(limit=30000):
+#for submission in psawApi.search_submissions(subreddit='placeAtlas2', limit=50000):
+#for submission in reddit.subreddit('placeAtlas2').search('flair:"New Entry"', syntax='lucene', limit=30000):
+for id in existing_ids:
+	try:
+		submission = reddit.submission(id)
+		submission.link_flair_text
+	except:
+		continue
 	"""
 	Auth setup
 	1. Head to https://www.reddit.com/prefs/apps
@@ -87,7 +97,7 @@ for submission in psawApi.search_submissions(subreddit='placeAtlas2', limit=5000
 	# 	else:
 	# 		continue
 
-	if (submission.link_flair_text == "New Entry" or submission.link_flair_text == "Processed Entry"):
+	if submission.link_flair_text == "New Entry" or submission.link_flair_text == "Processed Entry":
 
 		try:
 
@@ -113,10 +123,10 @@ for submission in psawApi.search_submissions(subreddit='placeAtlas2', limit=5000
 					if not key in submission_json_dummy:
 						submission_json_dummy[key] = submission_json[key];
 				(submission_json, validation_status) = format_all(submission_json_dummy, True)
-				
+
 				assert validation_status < 3, \
 					"Submission invalid after validation. This may be caused by not enough points on the path."
-					
+
 				outfile.write(json.dumps(submission_json, ensure_ascii=False) + ",\n")
 				editidsfile.write(submission.id + '\n')
 				successcount += 1
