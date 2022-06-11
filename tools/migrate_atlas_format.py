@@ -32,7 +32,7 @@ def migrate_atlas_format(entry: dict):
 	path = entry['path']
 
 	if isinstance(center, list):
-		
+
 		# Use the center to figure out which canvas expansion the entry is in.
 		if center[1] > 1000:
 			time_range = EXPANSION_2_RANGE
@@ -65,7 +65,7 @@ def migrate_atlas_format(entry: dict):
 		if isinstance(entry["subreddit"], str) and entry["subreddit"]:
 			new_entry['links']['subreddit'] = list(map(lambda x: FS_REGEX.sub(r"\1", x), COMMATIZATION.split(entry['subreddit'])))
 		del entry['subreddit']
-	
+
 	toreturn = {
 		**new_entry,
 		**entry
